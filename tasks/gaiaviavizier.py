@@ -68,11 +68,14 @@ def do_gaiaviavizier(catalog):
         
         ### Check if has DR1 or DR2 ID
         gaiaid = ''
-        for alias in catalog.entries[name][FASTSTARS.ALIAS]:
-            if alias['value'][:8] == 'Gaia DR2' and len(alias['value'])>len(gaiaid):
-                gaiaid = alias['value']
-            elif alias['value'][:8] == 'Gaia DR1' and len(alias['value'])>len(gaiaid):
-                gaiaid = alias['value']
+        try:
+            for alias in catalog.entries[name][FASTSTARS.ALIAS]:
+                if alias['value'][:8] == 'Gaia DR2' and len(alias['value'])>len(gaiaid):
+                    gaiaid = alias['value']
+                elif alias['value'][:8] == 'Gaia DR1' and len(alias['value'])>len(gaiaid):
+                    gaiaid = alias['value']
+        except KeyError:
+            print(name)
         hasgaiaid = True if len(gaiaid)>0 else False
         
         if (FASTSTARS.RA not in catalog.entries[name] or

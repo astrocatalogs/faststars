@@ -27,50 +27,11 @@ def do_ascii(catalog):
     """Process ASCII files extracted from datatables of published works."""
     task_str = catalog.get_current_task_str()
 
-    # 2017MNRAS.466.3077M
-    ### Has teff, logg, some abundances
-    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','bidin2016.csv')
-    data = read(datafile)
-    for row in pbar(data, task_str):
-        # disable this when LMC potential is in.
-        if str(row['shortid']) in ['390','403']:
-            oname = 'MoniBidin'+str(row['shortid'])
-            name, source = catalog.new_entry(oname, bibcode='2017MNRAS.466.3077M')
-            sourcedinescu = catalog.entries[name].add_source(bibcode='2018arXiv180702028C')
-            lgname = 'Gaia DR2 '+str(row['gaiadr2']).strip(' ')
-            sgname = 'Gaia DR2 '+str(row['gaiadr2']).strip(' ')[:6]
-            catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=sourcedinescu)
-            catalog.entries[name].add_quantity(FASTSTARS.ALIAS, sgname, source=sourcedinescu)
-            catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['rv']), e_value=str(row['rv_error']), source=source, u_value='km/s')
-            catalog.entries[name].add_quantity(FASTSTARS.LUM_DIST, str(row['dist']), e_lower_value=str(row['dist_error_low']), e_upper_value=str(row['dist_error_high']), source=source, u_value='kpc')
-            if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
-                catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'C. Moni Bidin, D. I. Casetti-Dinescu, T. M. Girard, L. Zhang, R. A. Méndez, K. Vieira, V. I. Korchagin, W. F. van Altena', source)
-                catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2018), source)
-
 #    catalog.journal_entries()
 
 #    return
     
-#def holding():   
-
-    # 2018arXiv180700427D
-    ### Has teff, logg, some abundances
-    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','du2018.csv')
-    data = read(datafile)
-    for row in pbar(data, task_str):
-        oname = str(row['name'])
-        name, source = catalog.new_entry(oname, bibcode='2018arXiv180700427D')
-        lgname = 'Gaia DR1 '+str(row['source_id']).strip(' ')
-        sgname = 'Gaia DR1 '+str(row['source_id']).strip(' ')[:6]
-        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
-        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, sgname, source=source)
-        catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['hrv']), e_value=str(row['hrv_error']), source=source, u_value='km/s')
-        catalog.entries[name].add_quantity(FASTSTARS.LUM_DIST, str(float(row['dhel'])/1e3), e_value=str(float(row['dhel_error'])/1e3), source=source, u_value='kpc')
-        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
-            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Cuihua Du, Hefan Li, Shuai Liu, Thomas Donlon, Heidi Jo Newberg', source)
-            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2018), source)
-    
-  
+#def holding(): 
 
     # 2007ApJ...660..311B
     datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII',
@@ -350,6 +311,14 @@ def do_ascii(catalog):
         if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER, 'Y. Q. Zhang, M. C. Smith, J. L. Carlin', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2014), source)
+        radeg = str(row['ra'])
+        decdeg = str(row['dec'])
+        ra, dec = coord(ra=radeg*u.deg, dec=decdeg*u.deg).to_string(
+                'hmsdms', sep=':').split()
+        catalog.entries[name].add_quantity(
+            FASTSTARS.RA, ra, source=source)
+        catalog.entries[name].add_quantity(
+            FASTSTARS.DEC, dec, source=source)
         catalog.entries[name].add_quantity(
                 FASTSTARS.VELOCITY, str(row['Vhel']), e_value=str(row['e_Vhel']), source=source)
         catalog.entries[name].add_quantity(
@@ -596,7 +565,7 @@ def do_ascii(catalog):
     
     # 2015AJ....150...77V
     datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII',
-                            'vickers2015.csv')
+                            'vickers2015final.csv')
     data = read(datafile, format='csv')
     for row in pbar(data, task_str):
         oname = str(row['Catalog'])
@@ -614,6 +583,9 @@ def do_ascii(catalog):
             FASTSTARS.RA, ra, source=source)
         catalog.entries[name].add_quantity(
             FASTSTARS.DEC, dec, source=source)
+        if str(row['distance']) != '':
+            catalog.entries[name].add_quantity(
+                FASTSTARS.LUM_DIST, str(row['distance']), u_value='kpc', source=source))
         catalog.entries[name].add_quantity(
                 FASTSTARS.SPECTRAL_TYPE, 'F', source=source)
         catalog.entries[name].add_quantity(
@@ -782,6 +754,59 @@ def do_ascii(catalog):
         catalog.entries[name].add_quantity(FASTSTARS.ALIAS, alias, source=source)
         catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['vrad']), e_lower_value=str(row['e_vrad_low']/2.576), e_upper_value=str(row['e_vrad_upp']/2.576), source=source, u_value='km/s')
         catalog.entries[name].add_quantity(FASTSTARS.LUM_DIST, str(row['dist']), e_lower_value=str(row['e_dist_low_1sig']), e_upper_value=str(row['e_dist_upp_1sig']), source=source, u_value='kpc')
+    
+    # 2017MNRAS.466.3077M
+    ### Has teff, logg, some abundances
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','bidin2016.csv')
+    data = read(datafile)
+    for row in pbar(data, task_str):
+        # disable this when LMC potential is in.
+        if str(row['shortid']) in ['390','403']:
+            oname = 'MoniBidin'+str(row['shortid'])
+            name, source = catalog.new_entry(oname, bibcode='2017MNRAS.466.3077M')
+            sourcedinescu = catalog.entries[name].add_source(bibcode='2018arXiv180702028C')
+            lgname = 'Gaia DR2 '+str(row['gaiadr2']).strip(' ')
+            sgname = 'Gaia DR2 '+str(row['gaiadr2']).strip(' ')[:6]
+            catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=sourcedinescu)
+            catalog.entries[name].add_quantity(FASTSTARS.ALIAS, sgname, source=sourcedinescu)
+            catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['rv']), e_value=str(row['rv_error']), source=source, u_value='km/s')
+            catalog.entries[name].add_quantity(FASTSTARS.LUM_DIST, str(row['dist']), e_lower_value=str(row['dist_error_low']), e_upper_value=str(row['dist_error_high']), source=source, u_value='kpc')
+            if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+                catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'C. Moni Bidin, D. I. Casetti-Dinescu, T. M. Girard, L. Zhang, R. A. Méndez, K. Vieira, V. I. Korchagin, W. F. van Altena', source)
+                catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2018), source)
+
+  
+
+    # 2018arXiv180700427D
+    ### Has teff, logg, some abundances
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','du2018.csv')
+    data = read(datafile)
+    for row in pbar(data, task_str):
+        oname = str(row['name'])
+        name, source = catalog.new_entry(oname, bibcode='2018arXiv180700427D')
+        lgname = 'Gaia DR1 '+str(row['source_id']).strip(' ')
+        sgname = 'Gaia DR1 '+str(row['source_id']).strip(' ')[:6]
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, sgname, source=source)
+        catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['hrv']), e_value=str(row['hrv_error']), source=source, u_value='km/s')
+        catalog.entries[name].add_quantity(FASTSTARS.LUM_DIST, str(float(row['dhel'])/1e3), e_value=str(float(row['dhel_error'])/1e3), source=source, u_value='kpc')
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Cuihua Du, Hefan Li, Shuai Liu, Thomas Donlon, Heidi Jo Newberg', source)
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2018), source)
+    
+    # 2018arXiv180802620B
+    ### Has teff, mass, logg, radii, etc.
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','bromley2018.csv')
+    data = read(datafile)
+    for row in pbar(data, task_str):
+        oname = str(row['GaiaDR2ID'])
+        lgname = 'Gaia DR2 '+str(row['GaiaDR2ID'])
+        sgname = 'Gaia DR2 '+str(row['GaiaDR2ID'])[:6]
+        print(lgname)
+        name, source = catalog.new_entry(sgname, bibcode='2018arXiv180802620B')
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Benjamin C. Bromley, Scott J. Kenyon, Warren R. Brown, Margaret J. Geller', source)
     
     catalog.journal_entries()
     

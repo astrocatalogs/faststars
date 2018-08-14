@@ -150,7 +150,7 @@
     },
     "fits_spectra": {
         "nice_name": "%pre FITS spectra",
-        "active": true,
+        "active": false,
         "update": false,
         "module": "faststars.tasks.general_data",
         "function": "do_external_fits_spectra",
