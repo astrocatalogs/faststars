@@ -311,8 +311,8 @@ def do_ascii(catalog):
         if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER, 'Y. Q. Zhang, M. C. Smith, J. L. Carlin', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2014), source)
-        radeg = str(row['ra'])
-        decdeg = str(row['dec'])
+        radeg = float(row['ra'])
+        decdeg = float(row['dec'])
         ra, dec = coord(ra=radeg*u.deg, dec=decdeg*u.deg).to_string(
                 'hmsdms', sep=':').split()
         catalog.entries[name].add_quantity(
@@ -585,7 +585,7 @@ def do_ascii(catalog):
             FASTSTARS.DEC, dec, source=source)
         if str(row['distance']) != '':
             catalog.entries[name].add_quantity(
-                FASTSTARS.LUM_DIST, str(row['distance']), u_value='kpc', source=source))
+                FASTSTARS.LUM_DIST, str(row['distance']), u_value='kpc', source=source)
         catalog.entries[name].add_quantity(
                 FASTSTARS.SPECTRAL_TYPE, 'F', source=source)
         catalog.entries[name].add_quantity(
