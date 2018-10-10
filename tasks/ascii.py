@@ -26,11 +26,10 @@ from ..utils import rgc_to_dhel
 def do_ascii(catalog):
     """Process ASCII files extracted from datatables of published works."""
     task_str = catalog.get_current_task_str()
-
-#    catalog.journal_entries()
-
-#    return
     
+    
+    #catalog.journal_entries()
+    #return
 #def holding(): 
 
     # 2007ApJ...660..311B
@@ -711,11 +710,11 @@ def do_ascii(catalog):
                
     # 2018arXiv180410607M
     datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII',
-                            'marchetti2018.txt')
+                            'marchetti2018.csv')
     data = read(datafile)
     for row in pbar(data, task_str):
         oname = 'Gaia DR2 '+str(row['source_id']).strip()[:6]
-        name, source = catalog.new_entry(oname, bibcode='2018arXiv180410607M')
+        name, source = catalog.new_entry(oname, bibcode='2018MNRAS.tmp.2466M')
         lname = 'Gaia DR2 '+str(row['source_id']).strip()
         catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lname, source=source)
         if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
@@ -728,6 +727,7 @@ def do_ascii(catalog):
             FASTSTARS.RA, ra, source=source)
         catalog.entries[name].add_quantity(
             FASTSTARS.DEC, dec, source=source)
+    
         
     # 2018arXiv180503194H
     datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','hattori2018.csv')

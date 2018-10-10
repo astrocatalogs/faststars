@@ -87,6 +87,7 @@ def do_gaiaviavizier(catalog):
                 if len(result)<1:
                     catalog.log.warning(
                 '"{}" should really have had a cross-match.'.format(name))
+                    print(gaiaid)
             else:
                 Mradec=str(catalog.entries[name][FASTSTARS.RA][0]['value'])+str(catalog.entries[name][FASTSTARS.DEC][0]['value'])
                 #print(name,Mradec)
