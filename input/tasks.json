@@ -137,23 +137,23 @@
         "repo": "input/faststars-external/AUXILIARY",
         "priority": 13
     },
+    "external_fits_spectra": {
+        "nice_name": "%pre FITS spectra",
+        "active": true,
+        "update": false,
+        "module": "faststars.tasks.general_data",
+        "function": "do_external_fits_spectra",
+        "groups": ["fits"],
+        "repo": "input/faststars-external",
+        "always_journal": true,
+        "priority": 14
+    },
     "donated_spectra": {
         "nice_name": "%pre Donated spectra",
         "active": true,
         "update": false,
         "module": "faststars.tasks.donations",
         "function": "do_donated_spectra",
-        "groups": ["spectra"],
-        "repo": "input/faststars-external",
-        "always_journal": true,
-        "priority": 14
-    },
-    "fits_spectra": {
-        "nice_name": "%pre FITS spectra",
-        "active": false,
-        "update": false,
-        "module": "faststars.tasks.general_data",
-        "function": "do_external_fits_spectra",
         "groups": ["spectra"],
         "repo": "input/faststars-external",
         "always_journal": true,

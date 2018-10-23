@@ -90,7 +90,9 @@ def do_external_fits_spectra(catalog):
         # for key in hdulist[0].header.keys():
         #     print(key, hdulist[0].header[key])
         if hdulist[0].header['SIMPLE']:
-            if 'JD' in hdrkeys:
+            if 'mjd' in metadict[filename]:
+                mjd = metadict[filename]['mjd']
+            elif 'JD' in hdrkeys:
                 mjd = str(jd_to_mjd(Decimal(str(hdulist[0].header['JD']))))
             elif 'MJD' in hdrkeys:
                 mjd = str(hdulist[0].header['MJD'])
@@ -100,6 +102,9 @@ def do_external_fits_spectra(catalog):
                 elif 'UTC-OBS' in hdrkeys:
                     dateobs = hdulist[0].header['DATE-OBS'].strip(
                     ) + 'T' + hdulist[0].header['UTC-OBS'].strip()
+                elif 'UT-TIME' in hdrkeys:
+                    dateobs = hdulist[0].header['UT-DATE'].strip(
+                    ) + 'T' + hdulist[0].header['UT-TIME'].strip()
                 mjd = str(astrotime(dateobs, format='isot').mjd)
             else:
                 raise ValueError("Couldn't find JD/MJD for spectrum.")

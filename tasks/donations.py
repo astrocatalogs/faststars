@@ -1,4 +1,4 @@
-"""Import tasks for data directly donated to the Open Supernova Catalog."""
+"""Import tasks for data directly donated to the Open FastStars Catalog."""
 import csv
 import json
 import os
