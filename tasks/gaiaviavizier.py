@@ -8,6 +8,8 @@ import astropy.units as un
 from astroquery.vizier import Vizier
 from astropy.table import vstack
 import warnings
+import pandas as pd
+from scipy.interpolate import interp1d
 
 from astrocats.catalog.photometry import PHOTOMETRY
 from astrocats.catalog.utils import is_number, pbar, single_spaces, uniq_cdl
@@ -44,6 +46,16 @@ silentgaiaobjectquery = v.query_object
 
 ##### Gaia parallax offset
 gaiaparallaxoffset = -0.029
+lei_data = pd.read_csv('/Users/douglasboubert/Science/astrocats/astrocats/faststars/input/faststars-external/AUXILIARY/lindegren_error_inflation.csv',header=None)
+lei_G = lei_data[0].values # Gaia magnitude
+lei_EIR = lei_data[1].values # ratio of external to internal error
+lei_EIR_interp = interp1d(lei_G,lei_EIR)
+def add_lindegren_inflation(AST_ERRORS,GMAG):
+    _EIR_factor = lei_EIR_interp(float(GMAG))
+    if isinstance(AST_ERRORS,list):
+        return [str(float(AE)*_EIR_factor) for AE in AST_ERRORS]
+    else:
+        return str(float(AST_ERRORS)*_EIR_factor)
 
 
 def do_gaiaviavizier(catalog):
@@ -143,8 +155,8 @@ def do_gaiaviavizier(catalog):
                 if not hasgaiaid: catalog.entries[name].add_quantity(FASTSTARS.ALIAS, gtab('DR2Name'), source=source)
                 gra,gde = coord(ra=float(gtab('RA_ICRS'))*un.deg,dec=float(gtab('DE_ICRS'))*un.deg,frame='icrs').to_string('hmsdms', sep=':').split()
                 if gtab('Plx') == '--':
-                    catalog.entries[name].add_quantity(FASTSTARS.RA,gra, source, e_value=gtab('e_RA_ICRS'), u_e_value='mas', correlations=[{CORRELATION.VALUE:gtab('RADEcor'), CORRELATION.QUANTITY:FASTSTARS.DEC, CORRELATION.KIND:'Pearson'}])
-                    catalog.entries[name].add_quantity(FASTSTARS.DEC,gde, source, e_value=gtab('e_DE_ICRS'), u_e_value='mas', correlations=[{CORRELATION.VALUE:gtab('RADEcor'), CORRELATION.QUANTITY:FASTSTARS.RA, CORRELATION.KIND:'Pearson'}])
+                    catalog.entries[name].add_quantity(FASTSTARS.RA,gra, source, e_value=add_lindegren_inflation(gtab('e_RA_ICRS'),gtab('Gmag')), u_e_value='mas', correlations=[{CORRELATION.VALUE:gtab('RADEcor'), CORRELATION.QUANTITY:FASTSTARS.DEC, CORRELATION.KIND:'Pearson'}])
+                    catalog.entries[name].add_quantity(FASTSTARS.DEC,gde, source, e_value=add_lindegren_inflation(gtab('e_DE_ICRS'),gtab('Gmag')), u_e_value='mas', correlations=[{CORRELATION.VALUE:gtab('RADEcor'), CORRELATION.QUANTITY:FASTSTARS.RA, CORRELATION.KIND:'Pearson'}])
                 else:
                     #print(gtab('Plx'))
                     cntgast += 1
@@ -153,7 +165,7 @@ def do_gaiaviavizier(catalog):
                     
                     ast_keys = [FASTSTARS.RA,FASTSTARS.DEC,FASTSTARS.PARALLAX,FASTSTARS.PROPER_MOTION_RA,FASTSTARS.PROPER_MOTION_DEC]
                     ast_values = [gra,gde,str(float(gtab('Plx'))-gaiaparallaxoffset),gtab('pmRA'),gtab('pmDE')]
-                    ast_errors = [gtab('e_RA_ICRS'),gtab('e_DE_ICRS'),gtab('e_Plx'),gtab('e_pmRA'),gtab('e_pmDE')]
+                    ast_errors = add_lindegren_inflation([gtab('e_RA_ICRS'),gtab('e_DE_ICRS'),gtab('e_Plx'),gtab('e_pmRA'),gtab('e_pmDE')],gtab('Gmag'))
                     ast_corr = [['1.0',gtab('RADEcor'),gtab('RAPlxcor'),gtab('RApmRAcor'),gtab('RApmDEcor')], [gtab('RADEcor'),'1.0',gtab('DEPlxcor'),gtab('DEpmRAcor'),gtab('DEpmDEcor')], [gtab('RAPlxcor'),gtab('DEPlxcor'),'1.0',gtab('PlxpmRAcor'),gtab('PlxpmDEcor')], [gtab('RApmRAcor'),gtab('DEpmRAcor'),gtab('PlxpmRAcor'),'1.0',gtab('pmRApmDEcor')], [gtab('RApmDEcor'),gtab('DEpmDEcor'),gtab('PlxpmDEcor'),gtab('pmRApmDEcor'),'1.0']]
                     ast_names = ['ra','dec','parallax','propermotionra','propermotiondec']
                     ast_units = ['hms','dms','mas','mas/yr','mas/yr']
