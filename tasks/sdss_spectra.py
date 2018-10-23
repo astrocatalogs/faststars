@@ -166,7 +166,7 @@ def do_sdss_spectra(catalog):
                     raise ValueError("Couldn't find JD/MJD for spectrum.")
                 if hdulist[i_coadd].header['NAXIS'] == 2:
                     waves = [str(x)
-                             for x in list(hdulist[i_coadd].data['wdisp'])]
+                             for x in list(10**hdulist[i_coadd].data['loglam'])]
                     fluxes = [str(x)
                               for x in list(hdulist[i_coadd].data['flux'])]
                 else:
