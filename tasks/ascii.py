@@ -794,6 +794,19 @@ def do_ascii(catalog):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Cuihua Du, Hefan Li, Shuai Liu, Thomas Donlon, Heidi Jo Newberg', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2018), source)
     
+    # 2018arXiv181104302S
+    ### Has teff, mass, logg, radii, etc.
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','scholz2018.csv')
+    data = read(datafile)
+    for row in pbar(data, task_str):
+        oname = str(row['ID'])
+        lgname = 'Gaia DR2 '+str(row['ID'])
+        sgname = 'Gaia DR2 '+str(row['ID'])[:6]
+        name, source = catalog.new_entry(sgname, bibcode='2018arXiv181104302S')
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Scholz, Ralf-Dieter', source)
+
     # 2018arXiv180802620B
     ### Has teff, mass, logg, radii, etc.
     datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','bromley2018.csv')
