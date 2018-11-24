@@ -1,6 +1,7 @@
 """Query against the Gaia database.
 """
 import re
+import os
 
 import numpy as np
 from astropy.coordinates import SkyCoord as coord
@@ -44,18 +45,6 @@ v=Vizier(columns=['**'])
 silentgaiaregionquery = v.query_region
 silentgaiaobjectquery = v.query_object
 
-##### Gaia parallax offset
-gaiaparallaxoffset = -0.029
-lei_data = pd.read_csv('/Users/douglasboubert/Science/astrocats/astrocats/faststars/input/faststars-external/AUXILIARY/lindegren_error_inflation.csv',header=None)
-lei_G = lei_data[0].values # Gaia magnitude
-lei_EIR = lei_data[1].values # ratio of external to internal error
-lei_EIR_interp = interp1d(lei_G,lei_EIR)
-def add_lindegren_inflation(AST_ERRORS,GMAG):
-    _EIR_factor = lei_EIR_interp(float(GMAG))
-    if isinstance(AST_ERRORS,list):
-        return [str(float(AE)*_EIR_factor) for AE in AST_ERRORS]
-    else:
-        return str(float(AST_ERRORS)*_EIR_factor)
 
 
 def do_gaiaviavizier(catalog):
@@ -66,6 +55,20 @@ def do_gaiaviavizier(catalog):
     
     task_str = catalog.get_current_task_str()
     keys = list(catalog.entries.keys())
+
+    ##### Gaia parallax offset
+    gaiaparallaxoffset = -0.029
+    datafile = os.path.join(catalog.get_current_task_repo(), 'AUXILIARY', 'lindegren_error_inflation.csv')
+    lei_data = pd.read_csv(datafile, header=None)
+    lei_G = lei_data[0].values # Gaia magnitude
+    lei_EIR = lei_data[1].values # ratio of external to internal error
+    lei_EIR_interp = interp1d(lei_G,lei_EIR)
+    def add_lindegren_inflation(AST_ERRORS,GMAG):
+        _EIR_factor = lei_EIR_interp(float(GMAG))
+        if isinstance(AST_ERRORS,list):
+            return [str(float(AE)*_EIR_factor) for AE in AST_ERRORS]
+        else:
+            return str(float(AST_ERRORS)*_EIR_factor)
 
     cntgphot = 0
     cntgast = 0
