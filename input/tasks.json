@@ -60,6 +60,7 @@
         "module": "faststars.tasks.gaiaviavizier",
         "function": "do_gaiaviavizier",
         "groups": ["meta"],
+        "repo": "input/faststars-external",
         "priority": 6
     },
     "gaiaviatap": {

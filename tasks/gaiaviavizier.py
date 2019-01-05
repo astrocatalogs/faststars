@@ -1,6 +1,7 @@
 """Query against the Gaia database.
 """
 import re
+import os
 
 import numpy as np
 from astropy.coordinates import SkyCoord as coord
@@ -45,7 +46,10 @@ v=Vizier(columns=['**'])
 silentgaiaregionquery = v.query_region
 silentgaiaobjectquery = v.query_object
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0093624423181d64ae7c4541d4f14e0088e5f2f6
 
 
 def do_gaiaviavizier(catalog):
@@ -57,12 +61,10 @@ def do_gaiaviavizier(catalog):
     task_str = catalog.get_current_task_str()
     keys = list(catalog.entries.keys())
 
-    #import os
-    #cwd = os.getcwd()
-    #print(cwd)
     ##### Gaia parallax offset
     gaiaparallaxoffset = -0.029
-    lei_data = pd.read_csv('./astrocats/faststars/input/faststars-external/AUXILIARY/lindegren_error_inflation.csv',header=None)
+    datafile = os.path.join(catalog.get_current_task_repo(), 'AUXILIARY', 'lindegren_error_inflation.csv')
+    lei_data = pd.read_csv(datafile, header=None)
     lei_G = lei_data[0].values # Gaia magnitude
     lei_EIR = lei_data[1].values # ratio of external to internal error
     lei_EIR_interp = interp1d(lei_G,lei_EIR)
@@ -77,7 +79,6 @@ def do_gaiaviavizier(catalog):
     with open('./astrocats/faststars/input/faststars-external/AUXILIARY/boubert_2019_gaiarvscuts.p', 'rb') as fp:
         b19_valid_rvs = pickle.load(fp)['source_id']
     _caught_by_cut = []
-
     cntgphot = 0
     cntgast = 0
     for oname in pbar(keys, task_str):
