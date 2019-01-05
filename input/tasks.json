@@ -91,7 +91,7 @@
     },
     "simbad": {
         "nice_name": "Querying against Simbad",
-        "active": true,
+        "active": false,
         "update": false,
         "module": "faststars.tasks.simbad",
         "function": "do_simbad",

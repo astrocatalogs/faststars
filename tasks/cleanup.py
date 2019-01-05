@@ -52,6 +52,11 @@ def do_cleanup(catalog):
                 POSSIBLEDISCOVERER_DATE_SOURCES = [DATE['source'] for DATE in catalog.entries[name][FASTSTARS.DISCOVER_DATE]]
                 EARLIESTSOURCE = POSSIBLEDISCOVERER_DATE_SOURCES[np.argmin(POSSIBLEDISCOVERER_DATE)]
                 EARLIESTDISCOVER_DATE = catalog.entries[name][FASTSTARS.DISCOVER_DATE][np.argmin(POSSIBLEDISCOVERER_DATE)]
+
+                # Deal with case where a star was 'discovered' multiple times in one year
+                if ',' in EARLIESTSOURCE:
+                    EARLIESTSOURCE = EARLIESTSOURCE.split(',')[0]
+
                 for DISCOVERER in catalog.entries[name][FASTSTARS.DISCOVERER]:
                     for DISCOVERERSOURCE in DISCOVERER['source'].split(','):
                         if DISCOVERERSOURCE == EARLIESTSOURCE:

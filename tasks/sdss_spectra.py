@@ -48,7 +48,7 @@ def do_sdss_spectra(catalog):
             while len(xid) > 1:
                 notstar = xid['z'].argmax()
                 xid.remove_row(notstar)
-            print(xid)
+            #print(xid)
 
             # star = None
             # for row in tab:

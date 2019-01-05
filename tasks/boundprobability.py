@@ -250,18 +250,18 @@ def do_boundprobability(catalog):
                 kine_vesc = kine_vesc_solar*np.power(kine_galrad/kine_samples_solar[:,0],-kine_alpha/2.0)
             
             
-            print(catalog.entries[name][FASTSTARS.DISCOVERER])
             # Store samples for each star
-            if False:
-                _discoverer = catalog.entries[name][FASTSTARS.DISCOVERER][0]['value']
-                _discover_date = catalog.entries[name][FASTSTARS.DISCOVER_DATE][0]['value']
-                if ('Bromley' in _discoverer or 'Scholz' in _discoverer) and _discover_date == '2018':
-                    kine_samples_output = np.copy(kine_samples_corrected)
-                    kine_samples_output[:,1] /= (k*kine_samples[:,0])
-                    kine_samples_output[:,2] /= (k*kine_samples[:,0])
-                    np.savez_compressed('/Users/douglasboubert/Documents/Science/GaiaDR2/LiteratureRV/ďata/'+name+'.npz',radec=Mradec,kine_samples_output=kine_samples_output,kine_samples_solar=kine_samples_solar,kine_vgrf=kine_vgrf)
-                    #np.savez_compressed('/data/dpb33/GaiaHypervelocity/WhiteDwarfs/mainsequence/samples/'+name+'.npz',radec=Mradec,kine_samples_output=kine_samples_output,kine_samples_solar=kine_samples_solar,kine_vgrf=kine_vgrf)
-                
+            if True:
+                if FASTSTARS.DISCOVERER in catalog.entries[name] and FASTSTARS.DISCOVER_DATE in catalog.entries[name]:
+                    _discoverer = catalog.entries[name][FASTSTARS.DISCOVERER][0]['value']
+                    _discover_date = catalog.entries[name][FASTSTARS.DISCOVER_DATE][0]['value']
+                    if ('Bromley' in _discoverer or 'Scholz' in _discoverer) and _discover_date == '2018':
+                        kine_samples_output = np.copy(kine_samples_corrected)
+                        kine_samples_output[:,1] /= (k*kine_samples[:,0])
+                        kine_samples_output[:,2] /= (k*kine_samples[:,0])
+                        np.savez_compressed('/Users/douglasboubert/Documents/Science/GaiaDR2/LiteratureRV/data/'+name+'.npz',radec=Mradec,kine_samples_output=kine_samples_output,kine_samples_solar=kine_samples_solar,kine_vgrf=kine_vgrf)
+                        #np.savez_compressed('/data/dpb33/GaiaHypervelocity/WhiteDwarfs/mainsequence/samples/'+name+'.npz',radec=Mradec,kine_samples_output=kine_samples_output,kine_samples_solar=kine_samples_solar,kine_vgrf=kine_vgrf)
+                    
 
             
             # Bound probability

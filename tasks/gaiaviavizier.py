@@ -10,6 +10,7 @@ from astropy.table import vstack
 import warnings
 import pandas as pd
 from scipy.interpolate import interp1d
+import pickle
 
 from astrocats.catalog.photometry import PHOTOMETRY
 from astrocats.catalog.utils import is_number, pbar, single_spaces, uniq_cdl
@@ -44,18 +45,7 @@ v=Vizier(columns=['**'])
 silentgaiaregionquery = v.query_region
 silentgaiaobjectquery = v.query_object
 
-##### Gaia parallax offset
-gaiaparallaxoffset = -0.029
-lei_data = pd.read_csv('/Users/douglasboubert/Science/astrocats/astrocats/faststars/input/faststars-external/AUXILIARY/lindegren_error_inflation.csv',header=None)
-lei_G = lei_data[0].values # Gaia magnitude
-lei_EIR = lei_data[1].values # ratio of external to internal error
-lei_EIR_interp = interp1d(lei_G,lei_EIR)
-def add_lindegren_inflation(AST_ERRORS,GMAG):
-    _EIR_factor = lei_EIR_interp(float(GMAG))
-    if isinstance(AST_ERRORS,list):
-        return [str(float(AE)*_EIR_factor) for AE in AST_ERRORS]
-    else:
-        return str(float(AST_ERRORS)*_EIR_factor)
+
 
 
 def do_gaiaviavizier(catalog):
@@ -66,6 +56,27 @@ def do_gaiaviavizier(catalog):
     
     task_str = catalog.get_current_task_str()
     keys = list(catalog.entries.keys())
+
+    #import os
+    #cwd = os.getcwd()
+    #print(cwd)
+    ##### Gaia parallax offset
+    gaiaparallaxoffset = -0.029
+    lei_data = pd.read_csv('./astrocats/faststars/input/faststars-external/AUXILIARY/lindegren_error_inflation.csv',header=None)
+    lei_G = lei_data[0].values # Gaia magnitude
+    lei_EIR = lei_data[1].values # ratio of external to internal error
+    lei_EIR_interp = interp1d(lei_G,lei_EIR)
+    def add_lindegren_inflation(AST_ERRORS,GMAG):
+        _EIR_factor = lei_EIR_interp(float(GMAG))
+        if isinstance(AST_ERRORS,list):
+            return [str(float(AE)*_EIR_factor) for AE in AST_ERRORS]
+        else:
+            return str(float(AST_ERRORS)*_EIR_factor)
+
+    ##### Boubert et al. (2019) RVS error
+    with open('./astrocats/faststars/input/faststars-external/AUXILIARY/boubert_2019_gaiarvscuts.p', 'rb') as fp:
+        b19_valid_rvs = pickle.load(fp)['source_id']
+    _caught_by_cut = []
 
     cntgphot = 0
     cntgast = 0
@@ -178,7 +189,11 @@ def do_gaiaviavizier(catalog):
                         catalog.entries[name].add_quantity(ast_keys[i], ast_values[i], source, e_value=ast_errors[i], u_value=ast_units[i], e_u_value=ast_error_units[i], correlations=corr_dict)
                     
                     if gtab('RV') != '--':
-                        catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, gtab('RV'), source, e_value=gtab('e_RV'), u_value='km/s')
+                        if int(gtab('Source')) in b19_valid_rvs:
+                            catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, gtab('RV'), source, e_value=gtab('e_RV'), u_value='km/s')
+                        else:
+                            #print(int(gtab('Source')))
+                            _caught_by_cut.append(int(gtab('Source')))
                     ##### This has been moved to boundprobability.py
                     # Convert parallax to distance
                     #if (FASTSTARS.LUM_DIST in catalog.entries[name]):
@@ -191,7 +206,11 @@ def do_gaiaviavizier(catalog):
                     #    '"{}" has distance from Astraatmadja & Bailer-Jones (2016) prior.'.format(name)) 
                     #    distance, distance_error = parallax_to_distance(name,result['Plx'][0],result['e_Plx'][0])
                     #    catalog.entries[name].add_quantity(FASTSTARS.LUM_DIST, str(distance), e_value=str(distance_error), u_value='kpc', source=source, derived=True)
-                        
+    
+    _box = {'source_id':_caught_by_cut}
+    with open('./boubert_2019_gaiarvscuts_caught.p', "wb") as f:
+        pickle.dump(_box, f, protocol=3)
+
     catalog.log.warning(
                 '"{}" have Gaia photometry and "{}" have Gaia astrometry.'.format(cntgphot,cntgast)) 
     catalog.journal_entries()
