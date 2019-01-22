@@ -251,7 +251,7 @@ def do_boundprobability(catalog):
             
             
             # Store samples for each star
-            if True:
+            if False:
                 if FASTSTARS.DISCOVERER in catalog.entries[name] and FASTSTARS.DISCOVER_DATE in catalog.entries[name]:
                     _discoverer = catalog.entries[name][FASTSTARS.DISCOVERER][0]['value']
                     _discover_date = catalog.entries[name][FASTSTARS.DISCOVER_DATE][0]['value']
