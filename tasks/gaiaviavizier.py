@@ -46,10 +46,6 @@ v=Vizier(columns=['**'])
 silentgaiaregionquery = v.query_region
 silentgaiaobjectquery = v.query_object
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 0093624423181d64ae7c4541d4f14e0088e5f2f6
 
 
 def do_gaiaviavizier(catalog):

@@ -27,6 +27,7 @@ def do_ascii(catalog):
     """Process ASCII files extracted from datatables of published works."""
     task_str = catalog.get_current_task_str()
     
+
     
     #catalog.journal_entries()
     #return
@@ -822,7 +823,22 @@ def do_ascii(catalog):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Ralf-Dieter Scholz', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2018), source)
 
-
+    # 2019arXiv190205061R
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','raddi2019.csv')
+    data = read(datafile)
+    for row in pbar(data, task_str):
+        oname = str(row['source_id'])
+        lgname = 'Gaia DR2 '+str(row['source_id'])
+        sgname = 'Gaia DR2 '+str(row['source_id'])[:6]
+        name, source = catalog.new_entry(sgname, bibcode='2019arXiv190205061R')
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, str(row['\ufeffname']), source=source)
+        if str(row['rv'])!='NA':
+            catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['rv']), e_value=str(row['rv_err']), source=source, u_value='km/s')
+        
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'R. Raddi, M. A. Hollands, D. Koester, J. J. Hermes, B. T. Gaensicke, U. Heber, K. J. Shen, D. M. Townsley, A. F. Pala, J. S. Reding, O. F. Toloza, I. Pelisoli, S. Geier, N. P. Gentile Fusillo, U. Munari, J. Strader', source)
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2019), source)
     
     catalog.journal_entries()
     
