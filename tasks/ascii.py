@@ -27,10 +27,9 @@ def do_ascii(catalog):
     """Process ASCII files extracted from datatables of published works."""
     task_str = catalog.get_current_task_str()
     
-
     
-    #catalog.journal_entries()
-    #return
+    
+#    return
 #def holding(): 
 
     # 2007ApJ...660..311B
@@ -838,6 +837,23 @@ def do_ascii(catalog):
         
         if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'R. Raddi, M. A. Hollands, D. Koester, J. J. Hermes, B. T. Gaensicke, U. Heber, K. J. Shen, D. M. Townsley, A. F. Pala, J. S. Reding, O. F. Toloza, I. Pelisoli, S. Geier, N. P. Gentile Fusillo, U. Munari, J. Strader', source)
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2019), source)
+    
+    catalog.journal_entries()
+
+    # 2019arXiv190205061R
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','yeom2019.csv')
+    data = read(datafile)
+    for row in pbar(data, task_str):
+        lgname = str(row['sdss'])
+        sgname = 'Pal'+str(row['pal'])
+        name, source = catalog.new_entry(sgname, bibcode='2019arXiv190507879R')
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+        if str(row['vrad'])!='NA':
+            catalog.entries[name].add_quantity(FASTSTARS.VELOCITY, str(row['vrad']), e_value=str(row['errvrad']), source=source, u_value='km/s')
+        
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Bum-Suk Yeom, Young Sun Lee, Jae-Rim Koo, Timothy C. Beers, Young Kwang Kim', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2019), source)
     
     catalog.journal_entries()
