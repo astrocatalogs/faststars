@@ -27,7 +27,7 @@ def do_ascii(catalog):
     """Process ASCII files extracted from datatables of published works."""
     task_str = catalog.get_current_task_str()
     
-    
+
     
 #    return
 #def holding(): 
@@ -854,6 +854,21 @@ def do_ascii(catalog):
         
         if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Bum-Suk Yeom, Young Sun Lee, Jae-Rim Koo, Timothy C. Beers, Young Kwang Kim', source)
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2019), source)
+    
+    catalog.journal_entries()
+
+    # 2019arXiv190205061R
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','marcos2019.csv')
+    data = read(datafile, format='csv',comment='#')
+    for row in pbar(data, task_str):
+        lgname = 'Gaia DR2 '+str(row['Gaia_DR2_designation'])
+        sgname = 'Gaia DR2 '+str(row['Gaia_DR2_designation'])[:6]
+        name, source = catalog.new_entry(sgname, bibcode='2019arXiv190605227D')
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Raul de la Fuente Marcos, Carlos de la Fuente Marcos', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2019), source)
     
     catalog.journal_entries()
