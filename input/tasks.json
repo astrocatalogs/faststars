@@ -106,6 +106,7 @@
         "module": "faststars.tasks.dust",
         "function": "do_dust",
         "groups": ["meta"],
+        "repo": "input/faststars-external/AUXILIARY",
         "priority": 11
     },
     "lamost": {

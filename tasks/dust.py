@@ -5,14 +5,12 @@ import re
 import numpy as np
 from astropy.coordinates import SkyCoord as coord
 import astropy.units as un
-from dustmaps.bayestar import BayestarWebQuery
-from dustmaps.sfd import SFDWebQuery
-bayestar = BayestarWebQuery()
-sfd = SFDWebQuery()
+from dustmaps.bayestar import BayestarQuery
+from dustmaps.sfd import SFDQuery
 
 from astrocats.catalog.utils import is_number, pbar, single_spaces, uniq_cdl
 from ..faststars import FASTSTARS
-from ..utils import name_clean
+from ..utils import name_clean, check_dustmaps
 
 
 def do_dust(catalog):
@@ -21,6 +19,11 @@ def do_dust(catalog):
     # Set preferred names, calculate some columns based on imported data,
     # sanitize some fields
     keys = list(catalog.entries.keys())
+
+    check_dustmaps(catalog.get_current_task_repo())
+
+    bayestar = BayestarQuery()
+    sfd = SFDQuery()
 
     for oname in pbar(keys, task_str):
         # Some events may be merged in cleanup process, skip them if
