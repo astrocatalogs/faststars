@@ -5,7 +5,6 @@ import re
 import numpy as np
 from astropy.coordinates import SkyCoord as coord
 import astropy.units as un
-from dustmaps.bayestar import BayestarQuery
 from dustmaps.sfd import SFDQuery
 
 from astrocats.catalog.utils import is_number, pbar, single_spaces, uniq_cdl
@@ -22,7 +21,6 @@ def do_dust(catalog):
 
     check_dustmaps(catalog.get_current_task_repo())
 
-    bayestar = BayestarQuery()
     sfd = SFDQuery()
 
     for oname in pbar(keys, task_str):
@@ -39,7 +37,7 @@ def do_dust(catalog):
         if (FASTSTARS.RA not in catalog.entries[name] or
                 FASTSTARS.DEC not in catalog.entries[name]):
             continue
-        elif (FASTSTARS.LUM_DIST not in catalog.entries[name]):
+        else:
             Mname = name
             Mradec = str(catalog.entries[name][FASTSTARS.RA][0]['value'])+str(catalog.entries[name][FASTSTARS.DEC][0]['value'])
             Mdist = '-1'
@@ -47,31 +45,6 @@ def do_dust(catalog):
             reddening = sfd(c)
             source = catalog.entries[name].add_source(bibcode='1998ApJ...500..525S')
             catalog.entries[name].add_quantity(FASTSTARS.EBV, str(reddening), source, upperlimit=True, derived=True)
-        else:
-            Mname = name
-            Mradec = str(catalog.entries[name][FASTSTARS.RA][0]['value'])+str(catalog.entries[name][FASTSTARS.DEC][0]['value'])
-            Mdist = str(catalog.entries[name][FASTSTARS.LUM_DIST][0]['value'])
-            Mdist_u = str(catalog.entries[name][FASTSTARS.LUM_DIST][0]['u_value'])
-            if Mdist_u == 'kpc':
-                c=coord(Mradec,unit=(un.hourangle, un.deg), distance=float(Mdist)*un.kpc, frame='icrs')
-            elif Mdist_u == 'pc':
-                c=coord(Mradec,unit=(un.hourangle, un.deg), distance=float(Mdist)*un.pc, frame='icrs')
-            else:
-                catalog.log.warning(
-                '"{}" has a distance but not an attached unit.'.format(oname))
-                continue
-            reddening = bayestar(c, mode='median')
-            
-            # If that reddening is a nan (ie. the star lies outside PanSTARRS) switch to SFD
-            if np.isnan(reddening) == True:
-                c=coord(Mradec,unit=(un.hourangle, un.deg), frame='icrs')
-                reddening = sfd(c)
-                source = catalog.entries[name].add_source(bibcode='1998ApJ...500..525S')
-                catalog.entries[name].add_quantity(FASTSTARS.EBV, str(reddening), source, upperlimit=True, derived=True)
-            else:
-                source = catalog.entries[name].add_source(bibcode='2018arXiv180103555G')
-                catalog.entries[name].add_quantity(
-                            FASTSTARS.EBV, str(reddening), source, derived=True)
-    
+
     catalog.journal_entries()
     return

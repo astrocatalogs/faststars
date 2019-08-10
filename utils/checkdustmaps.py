@@ -14,7 +14,7 @@ def check_dustmaps(_path):
         import dustmaps.sfd
         dustmaps.sfd.fetch()
 
-    if not os.path.exists(config['data_dir']+'bayestar'):
-        import dustmaps.bayestar
-        dustmaps.bayestar.fetch()
+    #if not os.path.exists(config['data_dir']+'bayestar'):
+    #    import dustmaps.bayestar
+    #    dustmaps.bayestar.fetch()
 
