@@ -28,8 +28,8 @@ def do_ascii(catalog):
     task_str = catalog.get_current_task_str()
     
     
-    
-    #return
+
+#    return
 #def holding(): 
 
     # 2007ApJ...660..311B
@@ -887,6 +887,21 @@ def do_ascii(catalog):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Cuihua Du, Hefan Li, Yepeng Yan, Heidi Jo Newberg, Jianrong Shi, Jun Ma, Yuqin Chen, Zhenyu Wu', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2019), source)
     
+    catalog.journal_entries()
+
+    # 2020arXiv200414587L
+    datafile = os.path.join(catalog.get_current_task_repo(), 'ASCII','li2020.csv')
+    data = read(datafile, format='csv')
+    for row in pbar(data, task_str):
+        #print(row.columns.keys())
+        lgname = 'Gaia DR2 '+str(row['sourceid'])
+        sgname = 'Gaia DR2 '+str(row['sourceid'])[:6]
+        name, source = catalog.new_entry(sgname, bibcode='2020arXiv200414587L')
+        catalog.entries[name].add_quantity(FASTSTARS.ALIAS, lgname, source=source)
+
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Jiao Li, Shi Jia, Yan Gao, Deng-Kai Jiang, Thomas Kupfer, Ulrich Heber, Chao Liu, Xue-Fei Chen, Zhan-Wen Han', source)
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2020), source)
     catalog.journal_entries()
     
     return
