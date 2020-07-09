@@ -927,7 +927,7 @@ def do_ascii(catalog):
         catalog.entries[name].add_quantity(
             FASTSTARS.DEC, dec, source=source)
         catalog.entries[name].add_quantity(
-                FASTSTARS.VELOCITY, str(row_vrad['vrad']), e_lower_value=str(row_vrad['vrad_min']), e_upper_value=str(row_vrad['vrad_max']), source=source)
+                FASTSTARS.VELOCITY, str(row_vrad['vrad']), e_lower_value=str(-row_vrad['vrad_max']), e_upper_value=str(row_vrad['vrad_min']), source=source)
         catalog.entries[name].add_quantity(
             FASTSTARS.LUM_DIST, str(row_distance['d[kpc]']), e_lower_value=str(-row_distance['d_plus[kpc]']), e_upper_value=str(row_distance['d_minus[kpc]']), u_value='kpc', source=source)
     catalog.journal_entries()
