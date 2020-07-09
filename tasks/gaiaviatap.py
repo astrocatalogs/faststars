@@ -46,7 +46,9 @@ class HiddenPrints:
 #silentgaiaquery = silent(Gaia.query_object)
 #v=Vizier(columns=['RA_ICRS','DE_ICRS','Plx','pmRA','pmDE','<Gmag>','e_RA_ICRS','e_DE_ICRS','e_Plx','e_pmRA','e_pmDE','RADEcor','RAPlxcor','RApmRAcor','RApmDEcor','DEPlxcor','DEpmRAcor','DEpmDEcor','PlxpmRAcor','PlxpmDEcor','pmRApmDEcor'])
 #v=Vizier(columns=['**'])
-ari = TapPlus(url="http://gaia.ari.uni-heidelberg.de/tap")
+#ari = TapPlus(url="http://gaia.ari.uni-heidelberg.de/tap")
+ari = TapPlus(url="https://gaia.ari.uni-heidelberg.de/tap")
+
 #silentgaiaquery = silent(v.query_region)
 silentari = ari.launch_job
 

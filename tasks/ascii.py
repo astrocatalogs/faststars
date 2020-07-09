@@ -28,8 +28,7 @@ def do_ascii(catalog):
     task_str = catalog.get_current_task_str()
     
     
-
-#    return
+    #return
 #def holding(): 
 
     # 2007ApJ...660..311B
@@ -903,6 +902,36 @@ def do_ascii(catalog):
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Jiao Li, Shi Jia, Yan Gao, Deng-Kai Jiang, Thomas Kupfer, Ulrich Heber, Chao Liu, Xue-Fei Chen, Zhan-Wen Han', source)
             catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2020), source)
     catalog.journal_entries()
+
+    # 2020A&A...637A..53K
+    datafile_vrad = os.path.join(catalog.get_current_task_repo(), 'ASCII',
+                            'kreuzer2020_vrad.dat')
+    datafile_distance = os.path.join(catalog.get_current_task_repo(), 'ASCII',
+                            'kreuzer2020_distance.dat')
+    data_vrad = read(datafile_vrad, format='csv')
+    data_distance = read(datafile_distance, format='csv')
+    for row_vrad,row_distance in pbar(zip(data_vrad,data_distance), task_str):
+        oname = str(row_distance['objid'])
+        name, source = catalog.new_entry(oname, bibcode='2020A&A...637A..53K')
+        if (FASTSTARS.DISCOVERER not in catalog.entries[name]):
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVERER,'Simon Kreuzer, Andreas Irrgang, Ulrich Heber', source)
+            catalog.entries[name].add_quantity(FASTSTARS.DISCOVER_DATE,str(2020), source)
+        catalog.entries[name].add_quantity(
+                FASTSTARS.ALIAS, row_vrad['object'], source=source)
+        radec = str(row_vrad['ra1'])+' '+str(row_vrad['ra2'])+' '+str(row_vrad['ra3'])+' '+str(row_vrad['dec1'])+' '+str(row_vrad['dec2'])+' '+str(row_vrad['dec3'])
+        ra, dec = coord(radec, 
+                unit=(u.hourangle, u.deg)).to_string(
+                'hmsdms', sep=':').split()
+        catalog.entries[name].add_quantity(
+            FASTSTARS.RA, ra, source=source)
+        catalog.entries[name].add_quantity(
+            FASTSTARS.DEC, dec, source=source)
+        catalog.entries[name].add_quantity(
+                FASTSTARS.VELOCITY, str(row_vrad['vrad']), e_lower_value=str(row_vrad['vrad_min']), e_upper_value=str(row_vrad['vrad_max']), source=source)
+        catalog.entries[name].add_quantity(
+            FASTSTARS.LUM_DIST, str(row_distance['d[kpc]']), e_lower_value=str(-row_distance['d_plus[kpc]']), e_upper_value=str(row_distance['d_minus[kpc]']), u_value='kpc', source=source)
+    catalog.journal_entries()
+
     
     return
 

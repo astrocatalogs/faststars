@@ -10,6 +10,7 @@ from astrocats.catalog.utils import jd_to_mjd, pbar, pretty_num
 from astropy.io import fits
 from astropy.time import Time as astrotime
 from astroquery.sdss import SDSS
+import urllib
 
 from ..faststars import FASTSTARS
 
@@ -78,7 +79,12 @@ def do_sdss_spectra(catalog):
 
             if not os.path.exists(datafile):
                 # Download spectra
-                sp = SDSS.get_spectra(matches=xid)[0]
+                try:
+                    sp = SDSS.get_spectra(matches=xid)[0]
+                except urllib.error.HTTPError:
+                    catalog.log.warning(
+                    '"{}" threw an HTTP 404, must be error upstream. Will likely go away on the next run.'.format(oname))
+                continue
 
                 # Identify star
                 # assert sp[2].data['class'][0]=='STAR'
